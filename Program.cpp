@@ -47,6 +47,7 @@ public:
         status = -1;
         return 0;
     }
+
     int set_status(Program **p)
     {
 
@@ -372,6 +373,7 @@ public:
     {
         if (testing_output_position_x > 0)
             testing_output_position_x--;
+
         return 0;
     }
 
@@ -387,7 +389,8 @@ public:
     {
         if (testing_output_position_y < (get_testing_length_output_y(NULL) - 1))
             testing_output_position_y++;
-
+        else
+            status = -1;
         return 0;
     }
 
@@ -471,17 +474,39 @@ public:
 
     int prog2(Program **p)
     {
-        (this->*p[0]->pointer)(p[0]->args);
-        (this->*p[1]->pointer)(p[1]->args);
+        // inner_prog++;
+
+        // if (inner_prog < 15)
+        {
+            (this->*p[0]->pointer)(p[0]->args);
+            (this->*p[1]->pointer)(p[1]->args);
+        }
+        // else
+        //{
+        //     status = -2;
+        // }
+
+        // inner_prog--;
 
         return 0;
     }
 
     int prog3(Program **p)
     {
-        (this->*p[0]->pointer)(p[0]->args);
-        (this->*p[1]->pointer)(p[1]->args);
-        (this->*p[2]->pointer)(p[2]->args);
+        // inner_prog++;
+
+        // if (inner_prog < 15)
+        {
+            (this->*p[0]->pointer)(p[0]->args);
+            (this->*p[1]->pointer)(p[1]->args);
+            (this->*p[2]->pointer)(p[2]->args);
+        }
+        // else
+        //{
+        //     status = -2;
+        // }
+
+        // inner_prog--;
 
         return 0;
     }
@@ -490,7 +515,7 @@ public:
     {
         int v = (this->*p[0]->pointer)(p[0]->args);
 
-        inner_loop += 1;
+        inner_loop++;
 
         if (inner_loop < 5 && v > 0 && v <= 30)
         {
@@ -501,11 +526,24 @@ public:
         }
         else
         {
-            inner_loop += -1;
             status = -2;
         }
 
-        inner_loop += -1;
+        inner_loop--;
+
+        return 0;
+    }
+
+    int read_memory(Program **p)
+    {
+        return memory;
+    }
+
+    int write_memory(Program **p)
+    {
+        int value = (this->*p[0]->pointer)(p[0]->args);
+
+        memory = value;
 
         return 0;
     }
@@ -539,6 +577,10 @@ private:
 
     int inner_loop;
 
+    int inner_prog;
+
+    int memory;
+
     void reset()
     {
         step = 0;
@@ -557,6 +599,10 @@ private:
         status = 0;
 
         inner_loop = 0;
+
+        inner_prog = 0;
+
+        memory = 0;
     }
 };
 
@@ -641,6 +687,9 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["prog2"] = &Runner::prog2;
     map["prog3"] = &Runner::prog3;
     map["loop"] = &Runner::loop;
+
+    map["read_memory"] = &Runner::read_memory;
+    map["write_memory"] = &Runner::write_memory;
 
     return map;
 }
@@ -777,6 +826,7 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
     // self->data[0] = read("example.txt");
     return 0;
 }
+
 /*
 static double evaluate(Array output, Array gt)
 {
@@ -818,7 +868,8 @@ static double evaluate(Array output, Array gt)
 
     //return result / (output.rows * output.cols);
     return result/sum;
-}*/
+}
+*/
 
 static double evaluate(Array output, Array gt)
 {

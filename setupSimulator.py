@@ -2,7 +2,7 @@ from distutils.core import setup, Extension
 
 module1 = Extension('Simulator',
                     sources = ['Program.cpp'],
-                    extra_compile_args = ["-O2"])
+                    extra_compile_args = ["-O3",  "-march=native"])
 
 setup (name = 'Simulator',
        version = '1.0',
