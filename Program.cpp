@@ -552,7 +552,7 @@ public:
     {
         reset();
 
-        while (step < 900 && status >= 0)
+        while (step < 100 && status >= 0)
         {
             step++;
             (this->*p->pointer)(p->args);
@@ -602,7 +602,7 @@ private:
 
         inner_prog = 0;
 
-        memory = 0;
+        memory = -1;
     }
 };
 
@@ -818,11 +818,17 @@ typedef struct RunnerSimulatorWrapper
 
 static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject *args, PyObject *kwargs)
 {
+    PyObject *obj = PyTuple_GetItem(args, 0);
+    PyObject *repr = PyObject_Str(obj); // Alternatively use PyObject_Repr, but it adds single quotes
+    PyObject *str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+    const char *bytes = PyBytes_AS_STRING(str);
+
     self->mInnerClass = new Runner();
     self->map = getFunctionMap();
     // self->program;
 
-    self->data = read_dir("/Users/E114560/Documents/research/arc-runner/data");
+    //self->data = read_dir("/Users/E114560/Documents/research/arc-runner/data");
+    self->data = read_dir(bytes);
     // self->data[0] = read("example.txt");
     return 0;
 }
