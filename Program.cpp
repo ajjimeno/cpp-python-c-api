@@ -458,6 +458,42 @@ public:
         return 0;
     }
 
+    int bigger_than_output_next(Program **p)
+    {
+        if (output_position_x < (get_length_output_x(NULL) - 1))
+        {
+            return data->training.at(input_id).at(1).array[output_position_y][output_position_x] >
+                   data->training.at(input_id).at(1).array[output_position_y][output_position_x + 1];
+        }
+
+        return 0;
+    }
+
+    int bigger_than_testing_output_next(Program **p)
+    {
+        if (testing_output_position_x < (get_testing_length_output_x(NULL) - 1))
+        {
+            return data->output.array[testing_output_position_y][testing_output_position_x] >
+                   data->output.array[testing_output_position_y][testing_output_position_x + 1];
+        }
+
+        return 0;
+    }
+
+    int swap_testing_output_next(Program **p)
+    {
+        if (!testing_is_output_end(NULL))
+        {
+            int tmp = data->output.array[testing_output_position_y][testing_output_position_x];
+            //std::cout << "Before:" << data->output.array[testing_output_position_y][testing_output_position_x] << "|" << data->output.array[testing_output_position_y][testing_output_position_x+1] << "\n";
+            data->output.array[testing_output_position_y][testing_output_position_x] = data->output.array[testing_output_position_y][testing_output_position_x + 1];
+            data->output.array[testing_output_position_y][testing_output_position_x + 1] = tmp;
+            //std::cout << "After:" << data->output.array[testing_output_position_y][testing_output_position_x] << "|" << data->output.array[testing_output_position_y][testing_output_position_x+1] << "\n";
+        }
+
+        return 0;
+    }
+
     int bigger_than(Program **p)
     {
         int output1 = (this->*p[0]->pointer)(p[0]->args);
@@ -557,6 +593,8 @@ public:
             step++;
             (this->*p->pointer)(p->args);
         }
+
+        //std::cout << status << "\n";
     }
 
 private:
@@ -682,6 +720,9 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
 
     map["comparison"] = &Runner::comparison;
     map["bigger_than"] = &Runner::bigger_than;
+    map["bigger_than_output_next"] = &Runner::bigger_than_output_next;
+    map["bigger_than_testing_output_next"] = &Runner::bigger_than_testing_output_next;
+    map["swap_testing_output_next"] = &Runner::swap_testing_output_next;
     map["equal"] = &Runner::equal;
 
     map["prog2"] = &Runner::prog2;
@@ -827,7 +868,7 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
     self->map = getFunctionMap();
     // self->program;
 
-    //self->data = read_dir("/Users/E114560/Documents/research/arc-runner/data");
+    // self->data = read_dir("/Users/E114560/Documents/research/arc-runner/data");
     self->data = read_dir(bytes);
     // self->data[0] = read("example.txt");
     return 0;
@@ -889,6 +930,7 @@ static double evaluate(Array output, Array gt)
     for (int i = 0; i < output.rows; i++)
         for (int j = 0; j < output.cols; j++)
         {
+            //std::cout << output.array[i][j] << "|" << gt.array[i][j] << "\n";
             if (output.array[i][j] == gt.array[i][j])
                 result++;
         }
