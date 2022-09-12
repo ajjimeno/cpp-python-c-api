@@ -485,10 +485,10 @@ public:
         if (!testing_is_output_end(NULL))
         {
             int tmp = data->output.array[testing_output_position_y][testing_output_position_x];
-            //std::cout << "Before:" << data->output.array[testing_output_position_y][testing_output_position_x] << "|" << data->output.array[testing_output_position_y][testing_output_position_x+1] << "\n";
+            // std::cout << "Before:" << data->output.array[testing_output_position_y][testing_output_position_x] << "|" << data->output.array[testing_output_position_y][testing_output_position_x+1] << "\n";
             data->output.array[testing_output_position_y][testing_output_position_x] = data->output.array[testing_output_position_y][testing_output_position_x + 1];
             data->output.array[testing_output_position_y][testing_output_position_x + 1] = tmp;
-            //std::cout << "After:" << data->output.array[testing_output_position_y][testing_output_position_x] << "|" << data->output.array[testing_output_position_y][testing_output_position_x+1] << "\n";
+            // std::cout << "After:" << data->output.array[testing_output_position_y][testing_output_position_x] << "|" << data->output.array[testing_output_position_y][testing_output_position_x+1] << "\n";
         }
 
         return 0;
@@ -506,6 +506,12 @@ public:
         int output1 = (this->*p[0]->pointer)(p[0]->args);
         int output2 = (this->*p[1]->pointer)(p[1]->args);
         return output1 == output2;
+    }
+
+    int no(Program **p)
+    {
+        int output1 = (this->*p[0]->pointer)(p[0]->args);
+        return !output1;
     }
 
     int prog2(Program **p)
@@ -570,6 +576,31 @@ public:
         return 0;
     }
 
+    int dowhile(Program **p)
+    {
+        int c = 0;
+
+        inner_loop++;
+
+        if (inner_loop < 5)
+        {
+
+            while ((this->*p[0]->pointer)(p[0]->args) && c < 10)
+            {
+                c++;
+                (this->*p[1]->pointer)(p[1]->args);
+            }
+        }
+        else
+        {
+            status = -2;
+        }
+
+        inner_loop--;
+
+        return 0;
+    }
+
     int read_memory(Program **p)
     {
         return memory;
@@ -594,7 +625,7 @@ public:
             (this->*p->pointer)(p->args);
         }
 
-        //std::cout << status << "\n";
+        // std::cout << status << "\n";
     }
 
 private:
@@ -724,10 +755,12 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["bigger_than_testing_output_next"] = &Runner::bigger_than_testing_output_next;
     map["swap_testing_output_next"] = &Runner::swap_testing_output_next;
     map["equal"] = &Runner::equal;
+    map["no"] = &Runner::no;
 
     map["prog2"] = &Runner::prog2;
     map["prog3"] = &Runner::prog3;
     map["loop"] = &Runner::loop;
+    map["dowhile"] = &Runner::dowhile;
 
     map["read_memory"] = &Runner::read_memory;
     map["write_memory"] = &Runner::write_memory;
@@ -930,7 +963,7 @@ static double evaluate(Array output, Array gt)
     for (int i = 0; i < output.rows; i++)
         for (int j = 0; j < output.cols; j++)
         {
-            //std::cout << output.array[i][j] << "|" << gt.array[i][j] << "\n";
+            // std::cout << output.array[i][j] << "|" << gt.array[i][j] << "\n";
             if (output.array[i][j] == gt.array[i][j])
                 result++;
         }
