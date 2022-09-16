@@ -83,6 +83,11 @@ public:
         return input_position_x == (get_length_input_x(NULL) - 1);
     }
 
+    int input_beginning(Program **)
+    {
+        return input_position_x == 0;
+    }
+
     int input_down_end(Program **)
     {
         return input_position_y == (get_length_input_y(NULL) - 1);
@@ -91,6 +96,11 @@ public:
     int output_end(Program **)
     {
         return output_position_x == (get_length_output_x(NULL) - 1);
+    }
+
+    int output_beginning(Program **)
+    {
+        return output_position_x == 0;
     }
 
     int output_down_end(Program **)
@@ -235,6 +245,18 @@ public:
         return 0;
     }
 
+    int reset_input_position(Program **)
+    {
+        input_position_x = 0;
+        return 0;
+    }
+
+    int reset_input_down_position(Program **)
+    {
+        input_position_y = 0;
+        return 0;
+    }
+
     int input_read(Program **)
     {
         int *test = data->training.at(input_id).at(0).array[input_position_y];
@@ -315,6 +337,18 @@ public:
     int testing_output_read(Program **)
     {
         return data->output.array[testing_output_position_y][testing_output_position_x];
+    }
+
+    int testing_reset_input_position(Program **)
+    {
+        testing_input_position_x = 0;
+        return 0;
+    }
+
+    int testing_reset_input_down_position(Program **)
+    {
+        testing_input_position_y = 0;
+        return 0;
     }
 
     int testing_output_write_previous(Program **p)
@@ -697,8 +731,10 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["get_1"] = &Runner::get_1;
 
     map["input_end"] = &Runner::input_end;
+    map["input_beginning"] = &Runner::input_beginning;
     map["input_down_end"] = &Runner::input_down_end;
     map["output_end"] = &Runner::output_end;
+    map["output_beginning"] = &Runner::output_beginning;
     map["output_down_end"] = &Runner::output_down_end;
     map["output_move_left"] = &Runner::output_move_left;
     map["output_move_right"] = &Runner::output_move_right;
@@ -722,6 +758,8 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["output_read"] = &Runner::output_read;
     map["reset_output_position"] = &Runner::reset_output_position;
     map["reset_output_down_position"] = &Runner::reset_output_down_position;
+    map["reset_input_position"] = &Runner::reset_input_position;
+    map["reset_input_down_position"] = &Runner::reset_input_down_position;
 
     map["get_testing_length_input_x"] = &Runner::get_testing_length_input_x;
     map["get_testing_length_input_y"] = &Runner::get_testing_length_input_y;
@@ -738,6 +776,8 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["testing_output_write"] = &Runner::testing_output_write;
     map["testing_reset_output_position"] = &Runner::testing_reset_output_position;
     map["testing_reset_output_down_position"] = &Runner::testing_reset_output_down_position;
+    map["testing_reset_input_position"] = &Runner::testing_reset_input_position;
+    map["testing_reset_input_down_position"] = &Runner::testing_reset_input_down_position;
     map["testing_output_move_left"] = &Runner::testing_output_move_left;
     map["testing_output_move_right"] = &Runner::testing_output_move_right;
     map["testing_output_move_down"] = &Runner::testing_output_move_down;
