@@ -42,7 +42,7 @@ vector<string> split(string s, string delimiter)
 
 Instance read_file(string file_name)
 {
-
+    //std::cout << "File:" << file_name << std::endl;
     string line;
     ifstream myfile(file_name);
 
@@ -199,7 +199,9 @@ static Instance *read_dir(const char *path)
 
     while ((entry = readdir(dir)) != NULL)
         if (entry->d_name[0] != '.')
+        {
             ins.push_back(read_file(s + entry->d_name));
+        }
 
     closedir(dir);
 

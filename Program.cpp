@@ -616,7 +616,7 @@ public:
 
         inner_loop++;
 
-        if (inner_loop < 5)
+        if (inner_loop < 3)
         {
 
             while ((this->*p[0]->pointer)(p[0]->args) && c < 10)
@@ -791,10 +791,14 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
 
     map["comparison"] = &Runner::comparison;
     map["bigger_than"] = &Runner::bigger_than;
+    map["bigger_thanW"] = &Runner::bigger_than;
+    map["bigger_thanR"] = &Runner::bigger_than;
     map["bigger_than_output_next"] = &Runner::bigger_than_output_next;
     map["bigger_than_testing_output_next"] = &Runner::bigger_than_testing_output_next;
     map["swap_testing_output_next"] = &Runner::swap_testing_output_next;
     map["equal"] = &Runner::equal;
+    map["equalW"] = &Runner::equal;
+    map["equalR"] = &Runner::equal;
     map["no"] = &Runner::no;
 
     map["prog2"] = &Runner::prog2;
@@ -968,6 +972,7 @@ static double evaluate(Array output, Array gt)
 
     if (output.rows != gt.rows || output.cols != gt.cols)
     {
+        
         std::cout << "Different" << std::endl;
     }
 
