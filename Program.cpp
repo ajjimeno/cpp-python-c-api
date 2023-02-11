@@ -257,6 +257,36 @@ public:
         return 0;
     }
 
+    int input_max(Program **)
+    {
+        //std:cout << "input_max\n";
+        int *arr = data->training.at(input_id).at(0).array[input_position_y];
+        int max = arr[0];
+        for (int i = 1; i < get_length_input_x(NULL); i++)
+        {
+            if (arr[i] > max)
+            {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+
+    int input_min(Program **)
+    {        //std:cout << "input_min\n";
+
+        int *arr = data->training.at(input_id).at(0).array[input_position_y];
+        int min = arr[0];
+        for (int i = 1; i < get_length_input_x(NULL); i++)
+        {
+            if (arr[i] < min)
+            {
+                min = arr[i];
+            }
+        }
+        return min;
+    }
+
     int input_read(Program **)
     {
         int *test = data->training.at(input_id).at(0).array[input_position_y];
@@ -319,6 +349,38 @@ public:
     int get_testing_output_position_x(Program **)
     {
         return testing_output_position_x;
+    }
+
+    int testing_input_max(Program **)
+    {
+                //std::cout << "testing_input_max\n";
+
+        int *arr = data->input.array[testing_input_position_y];
+        int max = arr[0];
+        for (int i = 1; i < get_testing_length_input_x(NULL); i++)
+        {
+            if (arr[i] > max)
+            {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+
+    int testing_input_min(Program **)
+    {
+                //std:cout << "testing_input_min\n";
+
+        int *arr = data->input.array[testing_input_position_y];
+        int min = arr[0];
+        for (int i = 1; i < get_testing_length_input_x(NULL); i++)
+        {
+            if (arr[i] < min)
+            {
+                min = arr[i];
+            }
+        }
+        return min;
     }
 
     int testing_input_read(Program **)
@@ -754,6 +816,8 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["input_move_right"] = &Runner::input_move_right;
     map["input_move_down"] = &Runner::input_move_down;
     map["input_move_up"] = &Runner::input_move_up;
+    map["input_max"] = &Runner::input_max;
+    map["input_min"] = &Runner::input_min;
     map["input_read"] = &Runner::input_read;
     map["output_read"] = &Runner::output_read;
     map["reset_output_position"] = &Runner::reset_output_position;
@@ -769,6 +833,8 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["get_testing_input_position_x"] = &Runner::get_testing_input_position_x;
     map["get_testing_output_position_y"] = &Runner::get_testing_output_position_y;
     map["get_testing_output_position_x"] = &Runner::get_testing_output_position_x;
+    map["testing_input_max"] = &Runner::testing_input_max;
+    map["testing_input_min"] = &Runner::testing_input_min;
     map["testing_input_read"] = &Runner::testing_input_read;
     map["testing_output_read_previous"] = &Runner::testing_output_read_previous;
     map["testing_output_read"] = &Runner::testing_output_read;
@@ -972,7 +1038,7 @@ static double evaluate(Array output, Array gt)
 
     if (output.rows != gt.rows || output.cols != gt.cols)
     {
-        
+
         std::cout << "Different" << std::endl;
     }
 

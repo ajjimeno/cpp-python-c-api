@@ -42,7 +42,7 @@ vector<string> split(string s, string delimiter)
 
 Instance read_file(string file_name)
 {
-    //std::cout << "File:" << file_name << std::endl;
+    std::cout << "File:" << file_name << std::endl;
     string line;
     ifstream myfile(file_name);
 
