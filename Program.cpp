@@ -681,7 +681,7 @@ public:
         if (inner_loop < 3)
         {
 
-            while ((this->*p[0]->pointer)(p[0]->args) && c < 10)
+            while (!(this->*p[0]->pointer)(p[0]->args) && c < 10)
             {
                 c++;
                 (this->*p[1]->pointer)(p[1]->args);
