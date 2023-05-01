@@ -715,7 +715,7 @@ public:
     {
         reset();
 
-        while (step < 100 && status >= 0)
+        while (step < 500 && status >= 0)
         {
             step++;
             (this->*p->pointer)(p->args);
