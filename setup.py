@@ -1,10 +1,14 @@
 from distutils.core import setup, Extension
+import os
 
-module1 = Extension('RunnerC',
-                    sources = ['RunnerSimulator.cpp'],
-                    extra_compile_args = ["-O2"])
+os.environ['CFLAGS'] = '-O3 -gstabs -march=native'
+os.environ['LDFLAGS'] = '-O3 -gstabs -march=native'
 
-setup (name = 'RunnerC',
+module1 = Extension('Simulator',
+                    sources = ['Program.cpp'],
+                    extra_compile_args = ["-g", "-O3",  "-march=native"])
+
+setup (name = 'Simulator',
        version = '1.0',
-       description = 'Fast version of the ARC runner',
-       ext_modules = [module1]) 
+       description = 'Fast version of the ARC simulator',
+       ext_modules = [module1])

@@ -333,7 +333,7 @@ public:
 
     int get_testing_input_position_y(Program **)
     {
-        return testing_output_position_y;
+        return testing_input_position_y;
     }
 
     int get_testing_input_position_x(Program **)
@@ -660,6 +660,9 @@ public:
             for (int i = 0; i < v; i++)
             {
                 (this->*p[1]->pointer)(p[1]->args);
+
+                if (status != 0)
+                    break;
             }
         }
         else
@@ -715,10 +718,13 @@ public:
     {
         reset();
 
-        while (step < 500 && status >= 0)
+        while (step < 200 && status >= 0)
         {
             step++;
             (this->*p->pointer)(p->args);
+
+            if (status != 0)
+              break;
         }
 
         // std::cout << status << "\n";
