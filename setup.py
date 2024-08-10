@@ -1,10 +1,10 @@
 from distutils.core import setup, Extension
 
-module1 = Extension('RunnerC',
-                    sources = ['RunnerSimulator.cpp'],
-                    extra_compile_args = ["-O2"])
+module1 = Extension('Simulator',
+                    sources = ['Program.cpp'],
+                    extra_compile_args = ["-O3",  "-march=native"])
 
-setup (name = 'RunnerC',
+setup (name = 'Simulator',
        version = '1.0',
-       description = 'Fast version of the ARC runner',
+       description = 'Fast version of the ARC simulator',
        ext_modules = [module1]) 

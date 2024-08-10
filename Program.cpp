@@ -259,7 +259,7 @@ public:
 
     int input_max(Program **)
     {
-        //std:cout << "input_max\n";
+        // std:cout << "input_max\n";
         int *arr = data->training.at(input_id).at(0).array[input_position_y];
         int max = arr[0];
         for (int i = 1; i < get_length_input_x(NULL); i++)
@@ -273,7 +273,7 @@ public:
     }
 
     int input_min(Program **)
-    {        //std:cout << "input_min\n";
+    { // std:cout << "input_min\n";
 
         int *arr = data->training.at(input_id).at(0).array[input_position_y];
         int min = arr[0];
@@ -353,7 +353,7 @@ public:
 
     int testing_input_max(Program **)
     {
-                //std::cout << "testing_input_max\n";
+        // std::cout << "testing_input_max\n";
 
         int *arr = data->input.array[testing_input_position_y];
         int max = arr[0];
@@ -369,7 +369,7 @@ public:
 
     int testing_input_min(Program **)
     {
-                //std:cout << "testing_input_min\n";
+        // std:cout << "testing_input_min\n";
 
         int *arr = data->input.array[testing_input_position_y];
         int min = arr[0];
@@ -539,6 +539,93 @@ public:
 
         return 0;
     }
+
+//"""
+//GPT-4 code
+//"""
+int testing_set_input_value(Program **p)
+{
+    int x = (this->*p[0]->pointer)(p[0]->args);
+    int y = (this->*p[1]->pointer)(p[1]->args);
+    int value = (this->*p[2]->pointer)(p[2]->args);
+
+    if (x >= 0 && x < get_testing_length_input_x(NULL) && y >= 0 && y < get_testing_length_input_y(NULL))
+    {
+        data->input.array[y][x] = value;
+        return 0;
+    }
+    return -1; // Error: out of bounds
+}
+
+int testing_set_output_value(Program **p)
+{
+    int x = (this->*p[0]->pointer)(p[0]->args);
+    int y = (this->*p[1]->pointer)(p[1]->args);
+    int value = (this->*p[2]->pointer)(p[2]->args);
+
+    if (x >= 0 && x < get_testing_length_output_x(NULL) && y >= 0 && y < get_testing_length_output_y(NULL))
+    {
+        data->output.array[y][x] = value;
+        return 0;
+    }
+    return -1; // Error: out of bounds
+}
+
+int testing_get_input_value(Program **p)
+{
+    int x = (this->*p[0]->pointer)(p[0]->args);
+    int y = (this->*p[1]->pointer)(p[1]->args);
+
+    if (x >= 0 && x < get_testing_length_input_x(NULL) && y >= 0 && y < get_testing_length_input_y(NULL))
+    {
+        return data->input.array[y][x];
+    }
+    return -1; // Error: out of bounds
+}
+
+int testing_get_output_value(Program **p)
+{
+    int x = (this->*p[0]->pointer)(p[0]->args);
+    int y = (this->*p[1]->pointer)(p[1]->args);
+
+    if (x >= 0 && x < get_testing_length_output_x(NULL) && y >= 0 && y < get_testing_length_output_y(NULL))
+    {
+        return data->output.array[y][x];
+    }
+    return -1; // Error: out of bounds
+}
+
+int testing_set_input_position(Program **p)
+{
+    int x = (this->*p[0]->pointer)(p[0]->args);
+    int y = (this->*p[1]->pointer)(p[1]->args);
+
+    if (x >= 0 && x < get_testing_length_input_x(NULL) && y >= 0 && y < get_testing_length_input_y(NULL))
+    {
+        testing_input_position_x = x;
+        testing_input_position_y = y;
+        return 0;
+    }
+    return -1; // Error: out of bounds
+}
+
+int testing_set_output_position(Program **p)
+{
+    int x = (this->*p[0]->pointer)(p[0]->args);
+    int y = (this->*p[1]->pointer)(p[1]->args);
+
+    if (x >= 0 && x < get_testing_length_output_x(NULL) && y >= 0 && y < get_testing_length_output_y(NULL))
+    {
+        testing_output_position_x = x;
+        testing_output_position_y = y;
+        return 0;
+    }
+    return -1; // Error: out of bounds
+}
+//"""
+//GPT-4 code end
+//"""
+
 
     int comparison(Program **p)
     {
@@ -715,7 +802,7 @@ public:
     {
         reset();
 
-        while (step < 500 && status >= 0)
+        while (step < 1000 && status >= 0)
         {
             step++;
             (this->*p->pointer)(p->args);
@@ -875,6 +962,13 @@ std::unordered_map<std::string, int (Runner::*)(Program **)> getFunctionMap()
     map["read_memory"] = &Runner::read_memory;
     map["write_memory"] = &Runner::write_memory;
 
+    //map["testing_set_input_value"] = &Runner::testing_set_input_value;
+    map["testing_set_output_value"] = &Runner::testing_set_output_value;
+    map["testing_get_input_value"] = &Runner::testing_get_input_value;
+    map["testing_get_output_value"] = &Runner::testing_get_output_value;
+    map["testing_set_input_position"] = &Runner::testing_set_input_position;
+    map["testing_set_output_position"] = &Runner::testing_set_output_position;
+
     return map;
 }
 
@@ -991,8 +1085,7 @@ int main()
  */
 typedef struct RunnerSimulatorWrapper
 {
-    PyObject_HEAD
-        Runner *mInnerClass;
+    PyObject_HEAD Runner *mInnerClass;
     Program *program;
     std::unordered_map<std::string, int (Runner::*)(Program **)> map;
     Instance *data;
@@ -1144,6 +1237,100 @@ static PyObject *wrapCompile(RunnerSimulatorWrapper *self, PyObject *args)
     return Py_None;
 }
 
+static PyObject *wrapOutput(RunnerSimulatorWrapper *self, PyObject *args)
+{
+    // No arguments expected
+    if (PyTuple_Size(args) != 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "wrapOutput takes no arguments");
+        return nullptr;
+    }
+
+    // Create a Python list object
+    PyObject *py_list = PyList_New(0);
+    if (!py_list)
+    {
+        return nullptr; // Handle potential errors
+    }
+
+    if (self->mInnerClass->data != NULL)
+    {
+        for (int i = 0; i < self->mInnerClass->data->output.rows; i++)
+        {
+            PyObject *py_inner_list = PyList_New(self->mInnerClass->data->output.cols);
+            if (!py_inner_list)
+            {
+                Py_DECREF(py_list);
+                return nullptr;
+            }
+
+            for (int j = 0; j < self->mInnerClass->data->output.cols; j++)
+            {
+                PyObject *py_int = PyLong_FromLong(self->mInnerClass->data->output.array[i][j]);
+                if (!py_int)
+                {
+                    Py_DECREF(py_list);
+                    Py_DECREF(py_inner_list);
+                    return nullptr;
+                }
+                PyList_SET_ITEM(py_inner_list, j, py_int);
+            }
+
+            PyList_Append(py_list, py_inner_list);
+        }
+    }
+
+
+    return py_list;
+}
+
+static PyObject *wrapGT(RunnerSimulatorWrapper *self, PyObject *args)
+{
+    // No arguments expected
+    if (PyTuple_Size(args) != 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "wrapOutput takes no arguments");
+        return nullptr;
+    }
+
+    // Create a Python list object
+    PyObject *py_list = PyList_New(0);
+    if (!py_list)
+    {
+        return nullptr; // Handle potential errors
+    }
+
+    if (self->mInnerClass->data != NULL)
+    {
+        for (int i = 0; i < self->mInnerClass->data->gt.rows; i++)
+        {
+            PyObject *py_inner_list = PyList_New(self->mInnerClass->data->gt.cols);
+            if (!py_inner_list)
+            {
+                Py_DECREF(py_list);
+                return nullptr;
+            }
+
+            for (int j = 0; j < self->mInnerClass->data->gt.cols; j++)
+            {
+                PyObject *py_int = PyLong_FromLong(self->mInnerClass->data->gt.array[i][j]);
+                if (!py_int)
+                {
+                    Py_DECREF(py_list);
+                    Py_DECREF(py_inner_list);
+                    return nullptr;
+                }
+                PyList_SET_ITEM(py_inner_list, j, py_int);
+            }
+
+            PyList_Append(py_list, py_inner_list);
+        }
+    }
+
+
+    return py_list;
+}
+
 // Getters and setters (here only for the 'eaten' attribute)
 static PyGetSetDef RunnerSimulatorWrapper_getsets[] = {
     /*{
@@ -1159,6 +1346,8 @@ static PyGetSetDef RunnerSimulatorWrapper_getsets[] = {
 static PyMethodDef RunnerSimulatorWrapper_methods[] = {
     {(char *)"run", (PyCFunction)wrapRun, METH_VARARGS, NULL},
     {(char *)"compile", (PyCFunction)wrapCompile, METH_VARARGS, NULL},
+    {(char *)"output", (PyCFunction)wrapOutput, METH_VARARGS, NULL},
+    {(char *)"gt", (PyCFunction)wrapGT, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}};
 
 static PyModuleDef RunnerSimulatorWrapper_module = {
